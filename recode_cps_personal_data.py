@@ -1,5 +1,7 @@
 import math
+import time
 
+from enum import Enum
 import pandas as pd
 from pandas import DataFrame, Series
 import os
@@ -24,7 +26,7 @@ def recode_sex(df: pd.DataFrame) -> pd.DataFrame:
     """
     temp = []
     num_row = len(df)
-    column_data = df["SEX"]
+    column_data = df["sex"]
     for i in range(num_row):
         if column_data[i] == 1:
             temp.append([1, 0])
@@ -50,7 +52,7 @@ def dummy_code_race(df: DataFrame) -> DataFrame:
     """
     temp = []
     num_row = len(df)
-    column_data = df["RACE"]
+    column_data = df["race"]
 
     for i in range(num_row):
         if column_data[i] == 100:
@@ -86,15 +88,16 @@ def dummy_code_educ(df: DataFrame) -> DataFrame:
 
     temp = []
     num_row = len(df)
-    column_data = df["EDUC"]
+    column_data = df["educ"]
     for i in range(num_row):
-        if 0 < column_data[i] < 73:
+        cell = int(column_data[i])
+        if cell == "high school diploma or equivalent":
             temp.append([1, 0, 0, 0])  # less than high school
-        elif 73 <= column_data[i] < 111:
+        elif 73 <= cell < 111:
             temp.append([0, 1, 0, 0])  # high school
-        elif column_data[i] == 111:
+        elif cell == 111:
             temp.append([0, 0, 1, 0])  # college
-        elif 111 < column_data[i] <= 998:
+        elif 111 < cell <= 998:
             temp.append([0, 0, 0, 1])  # more than college
         else:
             temp.append([0, 0, 0, 0])  # missing value
@@ -111,7 +114,7 @@ def ln_wage(df: DataFrame) -> DataFrame:
     """
     temp = []
     num_row = len(df)
-    column_data = df["INCWAGE"]
+    column_data = df["incwage"]
 
     for i in range(num_row):
         if column_data[i] not in [0, 99999999, 99999998]:
@@ -128,7 +131,7 @@ def merge_occupation(df_1: DataFrame, df_2: DataFrame) -> DataFrame:
     whereas df_2 is the occupation classifications of the occupations"""
     temp = []
     num_row = len(df_1)
-    ipums_occ = df_1["OCC"]
+    ipums_occ = df_1["occ"]
     cross_walk_ACS = df_2["ACS"]
     classifications = df_2["Vulnerability"]
 
@@ -151,7 +154,7 @@ def merge_occupation(df_1: DataFrame, df_2: DataFrame) -> DataFrame:
 def merge_occupation1(df_1: DataFrame, df_2: DataFrame) -> DataFrame:
     """Merge the occupation classifications of the individuals into the CPS data set."""
     temp = []
-    ipums_occ = df_1["OCC"]
+    ipums_occ = df_1["occ"]
     cross_walk_ACS = df_2["ACS"]
     classifications = df_2["Vulnerability"]
 
@@ -196,15 +199,22 @@ def dummy_code_vulnerability(df: DataFrame) -> DataFrame:
 
 if __name__ == "__main__":
     cwd = os.getcwd()
-    cps_path = os.path.join(cwd, "data", "occupation_merged.csv")
-    cross_walk_path = os.path.join(cwd, "data", "merged_cross_walk.csv")
-    dataframe = pd.read_csv(cps_path, encoding="utf-8")
-    dataframe2 = pd.read_csv(cross_walk_path)
-    # insert_serial_num(dataframe)
-    # dataframe = recode_sex(dataframe)
-    # dataframe = dummy_code_race(dataframe)
-    # dataframe = dummy_code_educ(dataframe)
-    # dataframe = ln_wage(dataframe)
+    cps_path = os.path.join(cwd, "data", "File_4.dta")
+    # cross_walk_path = os.path.join(cwd, "data", "merged_cross_walk.csv")
+    dataframe = pd.read_stata(cps_path)
+    new_df = dataframe["educ"]
+    for item in new_df:
+        if item.casefold() == "12th grade, no diploma":
+            print("FOUND")
+            break
+    print("did not found")
+    time.sleep(10000)
+    # dataframe2 = pd.read_csv(cross_walk_path)
+    insert_serial_num(dataframe)
+    dataframe = recode_sex(dataframe)
+    dataframe = dummy_code_race(dataframe)
+    dataframe = dummy_code_educ(dataframe)
+    dataframe = ln_wage(dataframe)
     # dataframe = merge_occupation1(dataframe, dataframe2)
     dataframe = dummy_code_vulnerability(dataframe)
     dataframe.to_csv("dummy occ.csv", index=False)

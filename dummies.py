@@ -1,0 +1,21 @@
+educ = {"niu or blank": 1,
+        "None, preschool, or kindergarten": 2,
+        "Grades 1, 2, 3, or 4": 10,
+        "Grades 5 or 6": 20,
+        "Grades 7 or 8": 30,
+        "Grade 9": 40,
+        "Grade 10": 50,
+        "Grade 11": 60,
+        "Grade 12": 70,
+        "12th grade, no diploma": 71,
+        "High school diploma or equivalent": 73,
+        "Some college but no degree": 81,
+        "Associate's degree, occupational/vocational program": 91,
+        "Associate's degree, academic program": 92,
+        "Bachelor's degree": 111,
+        "Master's degree": 123,
+        "Professional school degree": 124,
+        "Doctorate degree": 125,
+        "Missing/Unknown": 999
+        }
+
